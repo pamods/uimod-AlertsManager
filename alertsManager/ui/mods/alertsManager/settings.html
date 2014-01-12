@@ -1,0 +1,60 @@
+<div style="height: 400px; overflow: scroll; overflow-x:hidden;">
+	<h4>Alertfiltering</h4>
+	<div>
+		General quick info about cool hotkeys in this mod: <br/>
+		shift left click an alert to jump back in time to view it. <br/>
+		press the jump back key to go back<br/>
+		ctrl right click an alert to remove it. Alerts will not be removed with left click anymore.<br/>
+		Check the forums for more info!<br/><br/>
+	
+		Select which alerts you want to see ingame.<br/>
+		Note that all the following lists may contain unuseable units as they are created automatically.
+		Also note that you can hold ctrl to select multiple lines.<br/>
+		
+		<div>
+		Generally for each alert you can select a set of basic types to include and do a finer grained selection on a per unit basis.
+		</div>
+		
+		<div>
+		Mark units as interesting with: <input type="text" data-bind="value: selectedMarkKey" /><br/>
+		Interesting units will always show all supported alerts.<br/>
+		Jump-Back-Key: <input type="text" data-bind="value: jumpBackKey" /><br/>
+		This key can be used to jump back after shift clicking an event. It will move your camera and time back to before you clicked anything.
+		</div>
+		
+		<div>
+		<h5>Construction completed</h5>
+		<div style="float:left; margin-right: 50px;">
+		Unittypes for this event.<br/>
+		<select style="height: 300px; width: 280px" data-bind="options: knownUnitTypes, selectedOptions: showCreatedAlerts" multiple="true"> </select>
+		</div>
+		<div style="float:left; margin-right: 50px;">
+		Include single units<br/>
+		<select style="height: 300px; width: 280px" data-bind="options: knownUnits, optionsText: renderUnit, selectedOptions: includeUnitSpecAlertsCreated" multiple="true"> </select>
+		</div>
+		<div style="margin-right: 50px;">
+		Exclude single units<br/>
+		<select style="height: 300px; width: 280px" data-bind="options: knownUnits, optionsText: renderUnit, selectedOptions: excludedUnitSpecAlertsCreated" multiple="true"> </select>
+		</div>
+		</div>
+		
+		<div>
+		<h5>Unit destroyed</h5>
+		<div style="float:left; margin-right: 50px;">
+		Unittypes for this event.<br/>
+		<select style="height: 300px; width: 280px" data-bind="options: knownUnitTypes, selectedOptions: showDestroyedAlerts" multiple="true"> </select>
+		</div>
+		<div style="float:left; margin-right: 50px;">
+		Include single units<br/>
+		<select style="height: 300px; width: 280px" data-bind="options: knownUnits, optionsText: renderUnit, selectedOptions: includeUnitSpecAlertsDestroyed" multiple="true"> </select>
+		</div>
+		<div style=" margin-right: 50px;">
+		Exclude single units<br/>
+		<select style="height: 300px; width: 280px" data-bind="options: knownUnits, optionsText: renderUnit, selectedOptions: excludedUnitSpecAlertsDestroyed" multiple="true"> </select>
+		</div>
+		</div>
+		<div><br/>Sorry, this is not implemented for damaged events. They are buggy anyway. If you really want those ask in the forums</div>
+	</div>
+	<div>
+	</div>
+</div>
