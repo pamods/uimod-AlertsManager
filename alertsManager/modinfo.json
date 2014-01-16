@@ -24,6 +24,6 @@
         "coui://ui/mods/alertsManager/alertsManager.js",
         "coui://ui/mods/alertsManager/live_game.js"
     ],
-    "date": "2014/01/12",
-    "build": "58772"
+    "date": "2014/01/16",
+    "build": "59549"
 }
