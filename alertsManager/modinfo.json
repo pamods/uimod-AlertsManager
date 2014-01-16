@@ -4,7 +4,7 @@
     "display_name": "Alerts Manager",
     "description": "Filter what alerts you want to see. Also provides a Framework for a unified, easy to use alerts API that does not create conflicts between mods.",
     "author": "Cola_Colin",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "signature": "not yet implemented",
     "priority": 10,
     "enabled": true,
