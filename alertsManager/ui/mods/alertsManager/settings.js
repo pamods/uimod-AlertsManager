@@ -1,6 +1,6 @@
 (function() {
-	$('#game_settings ul').append('<li class="game_settings"><a href="#tab_alert_manager">AlertsManager</a></li>');
-	$('#game_settings').append("<div class='div_settings' id='tab_alert_manager'></div>");
+	$("#main .header").children(":first").append('<li><a href="#tab_alert_manager" data-toggle="pill">AlertsManager</a></li>');
+	$("#main .content").children(":first").append("<div class='option-list tab-pane' id='tab_alert_manager'></div>");
 
 	function AlertsSettingsModel() {
 		var self = this;

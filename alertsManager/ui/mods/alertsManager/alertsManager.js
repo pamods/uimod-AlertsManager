@@ -1,3 +1,4 @@
+console.log("load alertsManager");
 var alertsManager =
 	(typeof alertsManager === 'undefined') ? 
 	(function(){
@@ -8,25 +9,37 @@ var alertsManager =
 		  	// so this is kind of useless, thus no support for them is implemented
 		  	// that means: only the commander damage alert will trigger by default
 		  	// I am also concerned about the amount of damaged alerts that could be triggered
-		  	// if you want to try them just uncomment them, all other code will be able to handle them if you use the right watch_type
-		  	var _hookIntoAlerts = ['watchlist.setCreationAlertTypes', 'watchlist.setDeathAlertTypes'/*, 'watchlist.setDamageAlertTypes'*/];
-		  	var _allAlertsTypes = ['Mobile', 'Structure'];
+		// sight buggy, changing it kills enemy located messages
+		  	var _hookIntoAlerts = ['watchlist.setCreationAlertTypes', 'watchlist.setDeathAlertTypes', /*'watchlist.setSightAlertTypes',*/ 'watchlist.setTargetDestroyedAlertTypes'/*, 'watchlist.setDamageAlertTypes'*/];
+		  	var _allAlertsTypes = ['Mobile', 'Structure', 'Recon'];
 
 			var _watchTypes = {
 				CREATED: 0,
 				DAMAGED: 1,
 				DESTROYED: 2,
-				PING: 3
+				PING: 3,
+				SIGHT: 4,
+				PROJECTILE: 5,
+				FIRST_CONTACT: 6,
+				TARGET_DESTROYED: 7
 			};
 			
 			var _makeEmptyFilterSettings = function() {
-				return {selectedTypes: {}, includedUnits: {}, excludedUnits: {}};
-			}
+				return {selectedTypes: {}, excludedTypes: {}, includedUnits: {}, excludedUnits: {}};
+			};
 			
 			var _defaultFilterSettings = _makeEmptyFilterSettings();
-			_defaultFilterSettings.selectedTypes[_watchTypes.CREATED] = ['Factory'];
+			_defaultFilterSettings.selectedTypes[_watchTypes.CREATED] = ['Factory', 'Recon'];
+			
 			_defaultFilterSettings.selectedTypes[_watchTypes.DAMAGED] = ['Commander'];
+			
 			_defaultFilterSettings.selectedTypes[_watchTypes.DESTROYED] = ['Structure'];
+			_defaultFilterSettings.excludedTypes[_watchTypes.DESTROYED] = ['Wall'];
+			
+			_defaultFilterSettings.selectedTypes[_watchTypes.SIGHT] = ['Commander'];
+			
+			_defaultFilterSettings.selectedTypes[_watchTypes.TARGET_DESTROYED] = ['Commander']; // no structure, that's just too much
+			
 			// includedUnits and excludedUnits are not used by the default settings
 			
 			var _listenerCounter = 0;
@@ -64,6 +77,7 @@ var alertsManager =
 			var _makeFilterBy = function(settings) {
 				return function(payload) {
 					var selectedTypes = settings.selectedTypes;
+					var excludedTypes = settings.excludedTypes;
 					var includedUnits = settings.includedUnits;
 					var excludedUnits = settings.excludedUnits;
 
@@ -73,26 +87,49 @@ var alertsManager =
 					
 					function shouldBeRetained(notice) {
 						var wt = notice.watch_type;
-						// prevent killing yet unknown alert types
+						// prevent killing yet unknown alert types or types we do not handle, like i.e. projectile or ping
 						if (wt !== _watchTypes.CREATED && 
 								wt !== _watchTypes.DAMAGED && 
-								wt !== _watchTypes.DESTROYED) {
+								//wt !== _watchTypes.DESTROYED &&
+								wt !== _watchTypes.SIGHT && 
+								wt !== _watchTypes.TARGET_DESTROYED) {
+							console.log("unknown wt: "+wt);
 							return true;
 						}
-						var checkTypes = selectedTypes[wt];
-						var includeSpecs = includedUnits[wt];
-						var excludeSpecs = excludedUnits[wt];
+						var checkTypes = selectedTypes[wt] || [];
+						var exTypes = excludedTypes[wt] || [];
+						var includeSpecs = includedUnits[wt] || [];
+						var excludeSpecs = excludedUnits[wt] || [];
 						
 						if (contains(includeSpecs, notice.spec_id)) {
+							console.log("unit spec "+notice.spec_id);
 							return true;
 						} else if (contains(excludeSpecs, notice.spec_id)) {
+							console.log("exlcude spec "+notice.spec_id);
 							return false;
 						} else {
-							for (var i = 0; i < checkTypes.length; i++) {
-								if (contains(_unitSpecMapping[notice.spec_id], checkTypes[i])) {
-									return true;
+							var unitTypeBySpec = _unitSpecMapping[notice.spec_id];
+							console.log(unitTypeBySpec);
+							for (var i = 0; i < exTypes.length; i++) {
+								if (contains(unitTypeBySpec, exTypes[i])) {
+									console.log("exlcude type "+exTypes[i]);
+									return false;
 								}
 							}
+							for (var i = 0; i < checkTypes.length; i++) {
+								if (contains(unitTypeBySpec, checkTypes[i])) {
+									console.log("include type ");
+									return true;
+								} else {
+									console.log("no contains");
+									console.log(unitTypeBySpec);
+									console.log(checkTypes[i]);
+								}
+							}
+							console.log("nothing matched");
+							console.log(settings);
+							console.log(notice);
+							console.log(unitTypeBySpec);
 							return false; // nothing matched
 						}
 					}
@@ -104,7 +141,11 @@ var alertsManager =
 			var _addFilteredListener = function(listener, filterSettings) {
 				var filter = _makeFilterBy(filterSettings);
 				var actualListener = function(payload) {
+					console.log("before filter : ");
+					console.log(payload);
 					var filtered = filter(payload);
+					console.log("after filter:");
+					console.log(filtered);
 					if (filtered.list.length > 0) {
 						listener(filtered);
 					}
@@ -117,23 +158,31 @@ var alertsManager =
 			
 			var _initHook = function() {
 				var oldApplyUiStuff = model.applyUIDisplaySettings;
-				model.applyUIDisplaySettings = function() {
-				  function listenToAllAlerts() {
-					 for (var i = 0; i < _hookIntoAlerts.length; i++) {
+				function listenToAllAlerts() {
+					for (var i = 0; i < _hookIntoAlerts.length; i++) {
+						console.log("engine.call('"+_hookIntoAlerts[i]+"', '"+JSON.stringify(_allAlertsTypes)+"', '"+JSON.stringify([])+"');");
 						engine.call(_hookIntoAlerts[i], JSON.stringify(_allAlertsTypes), JSON.stringify([])); // I am assuming the 2nd on is an exclusion, tests need to validate it. If yes it should be used, too
 					 }
-				   }
+				}
+				model.applyUIDisplaySettings = function() {
 				   listenToAllAlerts();
 				   // to get rid of wrong settings by rAlertsFilter
 				   window.setTimeout(listenToAllAlerts, 3000);
 				   // this basically is a race condition vs rAlertsFilter, so better save than sorry
 				   window.setTimeout(listenToAllAlerts, 5000);
+				   window.setTimeout(listenToAllAlerts, 7000);
 				   
 				   oldApplyUiStuff();
 				};
+				listenToAllAlerts();
 				
 				_displayHandler = handlers.watch_list;
-				_removeDisplayListener = _addFilteredListener(_displayHandler, _defaultFilterSettings);
+				if (_displayHandler !== undefined) {
+					_removeDisplayListener = _addFilteredListener(_displayHandler, _defaultFilterSettings);					
+				} else {
+					_removeDisplayListener = function() {};
+				}
+				
 				handlers.watch_list = function(payload) {
 					_watchListHandler(payload);
 				};
@@ -145,7 +194,11 @@ var alertsManager =
 			
 			var _replaceDisplayFilter = function(settings) {
 				_removeDisplayListener();
-				_removeDisplayListener = _addFilteredListener(_displayHandler, settings);
+				if (_displayHandler !== undefined) {
+					_removeDisplayListener = _addFilteredListener(_displayHandler, settings);					
+				} else {
+					_removeDisplayListener = function() {};
+				}
 			};
 			
 			_initHook();
