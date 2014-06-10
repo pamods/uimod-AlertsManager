@@ -93,7 +93,6 @@ var alertsManager =
 								//wt !== _watchTypes.DESTROYED &&
 								wt !== _watchTypes.SIGHT && 
 								wt !== _watchTypes.TARGET_DESTROYED) {
-							console.log("unknown wt: "+wt);
 							return true;
 						}
 						var checkTypes = selectedTypes[wt] || [];
@@ -102,34 +101,21 @@ var alertsManager =
 						var excludeSpecs = excludedUnits[wt] || [];
 						
 						if (contains(includeSpecs, notice.spec_id)) {
-							console.log("unit spec "+notice.spec_id);
 							return true;
 						} else if (contains(excludeSpecs, notice.spec_id)) {
-							console.log("exlcude spec "+notice.spec_id);
 							return false;
 						} else {
 							var unitTypeBySpec = _unitSpecMapping[notice.spec_id];
-							console.log(unitTypeBySpec);
 							for (var i = 0; i < exTypes.length; i++) {
 								if (contains(unitTypeBySpec, exTypes[i])) {
-									console.log("exlcude type "+exTypes[i]);
 									return false;
 								}
 							}
 							for (var i = 0; i < checkTypes.length; i++) {
 								if (contains(unitTypeBySpec, checkTypes[i])) {
-									console.log("include type ");
 									return true;
-								} else {
-									console.log("no contains");
-									console.log(unitTypeBySpec);
-									console.log(checkTypes[i]);
 								}
 							}
-							console.log("nothing matched");
-							console.log(settings);
-							console.log(notice);
-							console.log(unitTypeBySpec);
 							return false; // nothing matched
 						}
 					}
@@ -141,11 +127,7 @@ var alertsManager =
 			var _addFilteredListener = function(listener, filterSettings) {
 				var filter = _makeFilterBy(filterSettings);
 				var actualListener = function(payload) {
-					console.log("before filter : ");
-					console.log(payload);
 					var filtered = filter(payload);
-					console.log("after filter:");
-					console.log(filtered);
 					if (filtered.list.length > 0) {
 						listener(filtered);
 					}
