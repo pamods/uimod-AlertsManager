@@ -7,7 +7,7 @@
     "version": "1.4.0",
     "signature": "not yet implemented",
     "priority": 10,
-    "enabled": false,
+    "enabled": true,
     "id": "alertsManager",
     "forum": "https://forums.uberent.com/threads/rel-alertsmanager-58772.55590/",
     "category": [

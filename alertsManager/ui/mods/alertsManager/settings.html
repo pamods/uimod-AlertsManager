@@ -1,10 +1,10 @@
-<div style="height: 700px; overflow: scroll; overflow-x:hidden;">
+<div style="height: 700px; width: 1200px; overflow: scroll; overflow-x:hidden;">
 	<h4>Alertfiltering</h4>
 	<div>
 		General quick info about cool hotkeys in this mod: <br/>
 		shift left click an alert to jump back in time to view it. <br/>
 		press the jump back key to go back<br/>
-		ctrl right click an alert to remove it. Alerts will not be removed with left click anymore.<br/>
+		ctrl click an alert to remove it. Alerts will not be removed with simple click anymore.<br/>
 		Check the forums for more info!<br/><br/>
 	
 		Select which alerts you want to see ingame.<br/>
@@ -34,7 +34,7 @@
 		</div>
 		<div style="margin-right: 50px;">
 		Exclude single units<br/>
-		<select style="height: 300px; width: 280px" data-bind="options: knownUnits, optionsText: renderUnit, selectedOptions: excludedUnitSpecAlertsCreated" multiple="true"> </select>
+		<select style="height: 300px; width: 280px" data-bind="options: knownUnits, optionsText: renderUnit, selectedOptions: excludeUnitSpecAlertsCreated" multiple="true"> </select>
 		</div>
 		</div>
 		
@@ -50,10 +50,31 @@
 		</div>
 		<div style=" margin-right: 50px;">
 		Exclude single units<br/>
-		<select style="height: 300px; width: 280px" data-bind="options: knownUnits, optionsText: renderUnit, selectedOptions: excludedUnitSpecAlertsDestroyed" multiple="true"> </select>
+		<select style="height: 300px; width: 280px" data-bind="options: knownUnits, optionsText: renderUnit, selectedOptions: excludeUnitSpecAlertsDestroyed" multiple="true"> </select>
 		</div>
 		</div>
+		
 		<div><br/>Sorry, this is not implemented for damaged events. They are buggy anyway. If you really want those ask in the forums</div>
+		<div><br/>Same for sight alerts: Not changeable without bugs</div>
+
+		<div>
+		<h5>Target destroyed</h5>
+		<div>The defaults of alertsManager already exclude enemy structures by default.</div>
+		<div style="float:left; margin-right: 50px;">
+		Unittypes for this event.<br/>
+		<select style="height: 300px; width: 280px" data-bind="options: knownUnitTypes, selectedOptions: showTargetDestroyedAlerts" multiple="true"> </select>
+		</div>
+		<div style="float:left; margin-right: 50px;">
+		Include single units<br/>
+		<select style="height: 300px; width: 280px" data-bind="options: knownUnits, optionsText: renderUnit, selectedOptions: includeUnitSpecAlertsTargetDestroyed" multiple="true"> </select>
+		</div>
+		<div style=" margin-right: 50px;">
+		Exclude single units<br/>
+		<select style="height: 300px; width: 280px" data-bind="options: knownUnits, optionsText: renderUnit, selectedOptions: excludeUnitSpecAlertsTargetDestroyed" multiple="true"> </select>
+		</div>
+		</div>
+		
+		
 	</div>
 	<div>
 	</div>
