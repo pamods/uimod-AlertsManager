@@ -38,7 +38,7 @@ var alertsManager =
 			
 			_defaultFilterSettings.selectedTypes[_watchTypes.SIGHT] = ['Commander'];
 			
-			_defaultFilterSettings.selectedTypes[_watchTypes.TARGET_DESTROYED] = ['Commander']; // no structure, that's just too much
+			_defaultFilterSettings.selectedTypes[_watchTypes.TARGET_DESTROYED] = ['Commander', 'Structure'];
 			
 			// includedUnits and excludedUnits are not used by the default settings
 			
@@ -90,7 +90,7 @@ var alertsManager =
 						// prevent killing yet unknown alert types or types we do not handle, like i.e. projectile or ping
 						if (wt !== _watchTypes.CREATED && 
 								wt !== _watchTypes.DAMAGED && 
-								//wt !== _watchTypes.DESTROYED &&
+								wt !== _watchTypes.DESTROYED &&
 								wt !== _watchTypes.SIGHT && 
 								wt !== _watchTypes.TARGET_DESTROYED) {
 							return true;
@@ -139,25 +139,16 @@ var alertsManager =
 			var _removeDisplayListener = undefined;
 			
 			var _initHook = function() {
-				var oldApplyUiStuff = model.applyUIDisplaySettings;
 				function listenToAllAlerts() {
 					for (var i = 0; i < _hookIntoAlerts.length; i++) {
-						console.log("engine.call('"+_hookIntoAlerts[i]+"', '"+JSON.stringify(_allAlertsTypes)+"', '"+JSON.stringify([])+"');");
+//						console.log("engine.call('"+_hookIntoAlerts[i]+"', '"+JSON.stringify(_allAlertsTypes)+"', '"+JSON.stringify([])+"');");
 						engine.call(_hookIntoAlerts[i], JSON.stringify(_allAlertsTypes), JSON.stringify([])); // I am assuming the 2nd on is an exclusion, tests need to validate it. If yes it should be used, too
 					 }
 				}
-				model.applyUIDisplaySettings = function() {
-				   listenToAllAlerts();
-				   // to get rid of wrong settings by rAlertsFilter
-				   window.setTimeout(listenToAllAlerts, 3000);
-				   // this basically is a race condition vs rAlertsFilter, so better save than sorry
-				   window.setTimeout(listenToAllAlerts, 5000);
-				   window.setTimeout(listenToAllAlerts, 7000);
+				for (var i = 0; i < 9; i+=2) {
+					window.setTimeout(listenToAllAlerts, i*1000);					
+				}
 				   
-				   oldApplyUiStuff();
-				};
-				listenToAllAlerts();
-				
 				_displayHandler = handlers.watch_list;
 				if (_displayHandler !== undefined) {
 					_removeDisplayListener = _addFilteredListener(_displayHandler, _defaultFilterSettings);					
